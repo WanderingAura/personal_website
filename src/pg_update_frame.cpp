@@ -13,13 +13,16 @@ void UpdateDrawFrame(void)
     Game& game = Game::getInstance();
     UpdateCamera(&game.cam, CAMERA_FREE);
     game.boidsDisplay.Update(game.cam);
+    game.lighting.Update(game.cam);
 
     if (IsKeyPressed(KEY_Z)) game.cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
 
     BeginDrawing();
         ClearBackground(RAYWHITE);
         BeginMode3D(game.cam);
-            game.room.Draw();
+            game.lighting.BeginMode();
+                game.room.Draw();
+            game.lighting.EndMode();
             game.boidsDisplay.Draw();
         EndMode3D();
 

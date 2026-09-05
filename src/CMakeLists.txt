@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     pg_hoverable_box.cpp
     pg_crosshair.cpp
     pg_room.cpp
+    pg_lighting.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} raylib m)

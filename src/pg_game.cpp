@@ -1,6 +1,7 @@
 #include "pg_game.hpp"
 #include <cassert>
 #include <raylib.h>
+#include <raymath.h>
 namespace PG
 {
 
@@ -17,7 +18,8 @@ Game& Game::getInstance()
 
 Game::Game() :
     boidsDisplay(BOIDS_NUM, Vector3{0,0}, 5, BoidsParams{}),
-    room(Vector3{0,0,0}, Vector3{24.0f, 8.0f, 24.0f}, "assets/stair_planks_diff_4k.jpg", "assets/japanese_cedar_planks_diff_4k.jpg")
+    room(Vector3{0,0,0}, Vector3{24.0f, 8.0f, 24.0f}, "assets/stair_planks_diff_1k.jpg", "assets/japanese_cedar_planks_diff_1k.jpg",
+         "assets/white_stucco_ao_1k.jpg", "assets/bark_willow_diff_1k.jpg", 10.0f)
 {
 }
 
@@ -39,6 +41,9 @@ void Game::Initialise()
     gameInstance->cubePos = (Vector3){0.0f, 0.0f, 0.0f};
 
     gameInstance->boidsDisplay.Initialise();
+
+    gameInstance->lighting.Initialise();
+    gameInstance->lighting.AddLight(LightType::Point, Vector3{ 0.0f, 4.0f, 0.0f }, Vector3Zero(), WHITE);
 }
 
 void Game::Shutdown()
