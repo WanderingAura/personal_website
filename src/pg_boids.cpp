@@ -7,29 +7,40 @@
 namespace PG
 {
 
-const constexpr float DEFAULT_VICINITY = 2.5f;
-const constexpr float DEFAULT_CLOSE = 1.2f;
-const constexpr float DEFAULT_BOID_SIZE = 0.3f;
-const constexpr float DEFAULT_ALIGNMENT_FACTOR = 0.01f;
-const constexpr float DEFAULT_COHESION_FACTOR = 0.01f;
-const constexpr float DEFAULT_REPULSION_FACTOR = 0.025f;
-const constexpr float DEFAULT_TURN_SPEED = 0.01f;
-const constexpr float DEFAULT_SPEED = 45.0f;
-
-
-
-Boids::Boids(u32 numBoids, BoundingBox bounds) :
-    bounds(bounds)
+// Steers dirComponent away from whichever edge it is within margin of. The steering
+// strength ramps up (quadratically) from 0 at the edge of the margin zone to
+// boundsAvoidStrength right at the wall, so it reverses direction before crossing rather
+// than a constant nudge that only starts once already at the wall.
+static float SteerAxisFromBounds(float dirComponent, float pos, float minBound, float maxBound, float margin, float boundsAvoidStrength)
 {
-    positions.resize(numBoids);
-    dirs.resize(numBoids);
+    float distFromMin = pos - minBound;
+    if (distFromMin < margin)
+    {
+        float depth = 1.0f - Clamp(distFromMin / margin, 0.0f, 1.0f);
+        return Lerp(dirComponent, fabsf(dirComponent), boundsAvoidStrength * depth * depth);
+    }
+
+    float distFromMax = maxBound - pos;
+    if (distFromMax < margin)
+    {
+        float depth = 1.0f - Clamp(distFromMax / margin, 0.0f, 1.0f);
+        return Lerp(dirComponent, -fabsf(dirComponent), boundsAvoidStrength * depth * depth);
+    }
+
+    return dirComponent;
 }
 
-void Boids::Initialise(u32 numBoids, BoundingBox b)
+Boids::Boids(u32 numBoids, BoundingBox bounds, const BoidsParams& params)
 {
+    Initialise(numBoids, bounds, params);
+}
+
+void Boids::Initialise(u32 numBoids, BoundingBox bounds, const BoidsParams& params)
+{
+    this->bounds = bounds;
+    this->params = params;
     positions.resize(numBoids);
     dirs.resize(numBoids);
-    bounds = b;
 }
 
 void Boids::InitialiseBoids()
@@ -55,16 +66,6 @@ void Boids::InitialiseBoids()
         Vector3 rotated = Vector3RotateByAxisAngle(Vector3UnitX, Vector3UnitY, yRotate);
         dirs[i] = Vector3RotateByAxisAngle(rotated, Vector3UnitZ, zRotate);
     }
-
-    params.vicinityDist = DEFAULT_VICINITY;
-    params.tooCloseDist = DEFAULT_CLOSE;
-    params.boidSize = DEFAULT_BOID_SIZE;
-    
-    params.alignmentFactor = DEFAULT_ALIGNMENT_FACTOR;
-    params.cohesionFactor = DEFAULT_COHESION_FACTOR;
-    params.repulsionFactor = DEFAULT_REPULSION_FACTOR;
-    params.turnSpeed = DEFAULT_TURN_SPEED;
-    params.speed = DEFAULT_SPEED;
 
     isInitialised = true;
 }
@@ -142,33 +143,9 @@ void Boids::UpdateBoidPositions()
         
         // Adjust to avoid bounds
         // ----------------------------
-
-        // TODO: there must be a better way to do this with less branches
-        // could check disassembly to check if compiler optimises well.
-        if (curBoidPos.x < bounds.min.x + BOUNDS_MARGIN.x)
-        {
-            dirs[i].x += params.turnSpeed;
-        }
-        if (curBoidPos.x > bounds.max.x - BOUNDS_MARGIN.x)
-        {
-            dirs[i].x -= params.turnSpeed;
-        }
-        if (curBoidPos.y < bounds.min.y + BOUNDS_MARGIN.y)
-        {
-            dirs[i].y += params.turnSpeed;
-        }
-        if (curBoidPos.y > bounds.max.y - BOUNDS_MARGIN.y)
-        {
-            dirs[i].y -= params.turnSpeed;
-        }
-        if (curBoidPos.z < bounds.min.z + BOUNDS_MARGIN.z)
-        {
-            dirs[i].z += params.turnSpeed;
-        }
-        if (curBoidPos.z > bounds.max.z - BOUNDS_MARGIN.z)
-        {
-            dirs[i].z -= params.turnSpeed;
-        }
+        dirs[i].x = SteerAxisFromBounds(dirs[i].x, curBoidPos.x, bounds.min.x, bounds.max.x, BOUNDS_MARGIN.x, params.boundsAvoidStrength);
+        dirs[i].y = SteerAxisFromBounds(dirs[i].y, curBoidPos.y, bounds.min.y, bounds.max.y, BOUNDS_MARGIN.y, params.boundsAvoidStrength);
+        dirs[i].z = SteerAxisFromBounds(dirs[i].z, curBoidPos.z, bounds.min.z, bounds.max.z, BOUNDS_MARGIN.z, params.boundsAvoidStrength);
 
         dirs[i] = Vector3ClampValue(dirs[i], 0.02f, 0.2f);
 

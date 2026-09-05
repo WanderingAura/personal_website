@@ -1,6 +1,7 @@
 .cache/
 .clangd
 build/
+*_build/
 compile_commands.json
 
 # Prerequisites

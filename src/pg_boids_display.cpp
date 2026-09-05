@@ -5,7 +5,7 @@
 namespace PG
 {
 
-BoidsDisplay::BoidsDisplay(u32 numBoids, Vector3 position, float size) :
+BoidsDisplay::BoidsDisplay(u32 numBoids, Vector3 position, float size, const BoidsParams& params) :
     pos(position),
     size(size)
 {
@@ -13,7 +13,13 @@ BoidsDisplay::BoidsDisplay(u32 numBoids, Vector3 position, float size) :
     Vector3 minPoint = Vector3SubtractValue(position, size / 2);
     Vector3 maxPoint = Vector3AddValue(position, size / 2);
     BoundingBox boidsBoundingBox = {minPoint, maxPoint};
-    boids.Initialise(numBoids, boidsBoundingBox);
+
+    boids.Initialise(numBoids, boidsBoundingBox, params);
+}
+
+void BoidsDisplay::Initialise()
+{
+    boids.InitialiseBoids();
 }
 
 void BoidsDisplay::Update()

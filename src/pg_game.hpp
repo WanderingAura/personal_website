@@ -1,5 +1,5 @@
 #include "raylib.h"
-#include "pg_boids.hpp"
+#include "pg_boids_display.hpp"
 namespace PG
 {
     class Game
@@ -7,7 +7,7 @@ namespace PG
     public:
         Camera3D cam;
         Vector3 cubePos;
-        Boids boids;
+        BoidsDisplay boidsDisplay;
     public:
 
         static Game& getInstance();

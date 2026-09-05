@@ -16,7 +16,7 @@ Game& Game::getInstance()
 }
 
 Game::Game() :
-    boids(BOIDS_NUM, BOIDS_BOUNDS)
+    boidsDisplay(BOIDS_NUM, Vector3{0,0}, 5, BoidsParams{})
 {
 }
 
@@ -37,7 +37,7 @@ void Game::Initialise()
     // initialise cube position
     gameInstance->cubePos = (Vector3){0.0f, 0.0f, 0.0f};
 
-    gameInstance->boids.InitialiseBoids();
+    gameInstance->boidsDisplay.Initialise();
 }
 
 void Game::Shutdown()

@@ -9,26 +9,17 @@ namespace PG
 
 void UpdateDrawFrame(void)
 {
-    // Update Frame
-    //----------------------------------------------------------------------------------
     Game& game = Game::getInstance();
     UpdateCamera(&game.cam, CAMERA_FREE);
-    game.boids.UpdateBoidPositions();
+    game.boidsDisplay.Update();
 
     if (IsKeyPressed(KEY_Z)) game.cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
 
-    // Draw
-    //----------------------------------------------------------------------------------
     BeginDrawing();
-    ClearBackground(RAYWHITE);
+        ClearBackground(RAYWHITE);
         BeginMode3D(game.cam);
-            // DrawCubeWires(game.cubePos, 2.0f, 2.0f, 2.0f, MAROON);
             DrawCube(Vector3{5.0f, 5.0f, 0.0f}, 0.0f, 10.0f, 10.0f, RED);
-            rlBegin(RL_TRIANGLES);
-                Cone::DrawWithTriangles((Vector3){-5.0f}, Vector3UnitX, 1.0f, 5.0f, 32, RED);
-                Cone::DrawWithTriangles((Vector3){-5.0f}, Vector3UnitX + Vector3UnitY, 1.0f, 5.0f, 32, BLUE);
-                game.boids.DrawBoidsViaTriangles();
-            rlEnd();
+            game.boidsDisplay.Draw();
             DrawGrid(10, 1.0f);
         EndMode3D();
 
@@ -41,7 +32,6 @@ void UpdateDrawFrame(void)
         DrawText("- Z to zoom to (0, 0, 0)", 40, 80, 10, DARKGRAY);
 
     EndDrawing();
-    //----------------------------------------------------------------------------------
 }
 
 }
