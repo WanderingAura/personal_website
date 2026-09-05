@@ -21,6 +21,7 @@ BoidsDisplay::BoidsDisplay(u32 numBoids, Vector3 position, float size, const Boi
         Vector3{ position.x + size / 2, position.y + baseThickness, position.z + size / 2 },
     };
     base = HoverableBox(baseBounds, BASE_COLOR, "Boids flocking simulation");
+    baseLabel = BoxLabel(baseBounds, "Click here to adjust parameters");
 
     BoundingBox boidsBoundingBox =
     {
@@ -34,6 +35,7 @@ BoidsDisplay::BoidsDisplay(u32 numBoids, Vector3 position, float size, const Boi
     scaledParams.boidSize = size * params.boidSizeFraction;
 
     boids.Initialise(numBoids, boidsBoundingBox, scaledParams);
+    menu = BoidsParamsMenu(boids.GetParams());
 }
 
 void BoidsDisplay::Initialise()
@@ -44,7 +46,18 @@ void BoidsDisplay::Initialise()
 void BoidsDisplay::Update(Camera3D cam)
 {
     boids.UpdateBoidPositions();
+
+    if (menu.IsOpen())
+    {
+        menu.Update();
+        return;
+    }
+
     base.Update(Crosshair::GetPickRay(cam));
+    if (base.IsHovered() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+        menu.Open();
+    }
 }
 
 using Dimensions = Vector3;
@@ -67,6 +80,7 @@ void BoidsDisplay::Draw()
     rlEnd();
 
     base.Draw();
+    baseLabel.Draw();
 
     Dimensions dims = GetDimsFromBoundingBox(boids.bounds);
     Vector3 center = Vector3Add(boids.bounds.min, Vector3Scale(dims, 0.5f));
@@ -78,7 +92,20 @@ void BoidsDisplay::Draw()
 
 void BoidsDisplay::DrawTooltip()
 {
-    base.DrawTooltip();
+    if (!menu.IsOpen())
+    {
+        base.DrawTooltip();
+    }
+}
+
+void BoidsDisplay::DrawMenu() const
+{
+    menu.Draw();
+}
+
+bool BoidsDisplay::IsMenuOpen() const
+{
+    return menu.IsOpen();
 }
 
 }

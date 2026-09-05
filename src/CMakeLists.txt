@@ -11,6 +11,10 @@ add_executable(${PROJECT_NAME}
     pg_crosshair.cpp
     pg_room.cpp
     pg_lighting.cpp
+    pg_slider.cpp
+    pg_boids_params_menu.cpp
+    pg_box_label.cpp
+    pg_painting.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} raylib m)

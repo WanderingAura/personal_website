@@ -1,3 +1,4 @@
+#pragma once
 #include "raylib.h"
 #include <vector>
 #include "pg_types.hpp"
@@ -37,6 +38,10 @@ public:
 
     // this should be called within rlBegin(RL_TRIANGLES)
     void DrawBoidsViaTriangles();
+
+    // mutable access for live tuning (e.g. BoidsParamsMenu); the returned reference is only
+    // valid as long as this Boids instance is
+    BoidsParams& GetParams();
 private:
 
     bool isInitialised = false;

@@ -166,4 +166,9 @@ void Boids::DrawBoidsViaTriangles()
     }
 }
 
+BoidsParams& Boids::GetParams()
+{
+    return params;
+}
+
 }

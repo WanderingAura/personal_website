@@ -19,6 +19,11 @@ int main()
     //--------------------------------------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "Personal Gallery");
 
+    // ESC is used to close the boids params menu, not just to quit; the default exit key
+    // would quit unconditionally on Esc regardless of the menu, so it's disabled here and
+    // PG::ShouldQuit() (below) does the equivalent check but only when the menu isn't open
+    SetExitKey(KEY_NULL);
+
     DisableCursor();
     PG::Game::Initialise();
 
@@ -29,7 +34,7 @@ int main()
     //--------------------------------------------------------------------------------------
 
     // Main game loop
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    while (!WindowShouldClose() && !PG::ShouldQuit())    // Detect window close button or Esc (see PG::ShouldQuit)
     {
         PG::UpdateDrawFrame();
     }
