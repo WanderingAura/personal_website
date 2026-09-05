@@ -60,13 +60,6 @@ void BoidsDisplay::Update(Camera3D cam)
     }
 }
 
-using Dimensions = Vector3;
-
-static inline Dimensions GetDimsFromBoundingBox(BoundingBox box)
-{
-    return Vector3Subtract(box.max, box.min);
-}
-
 const Color BoidsDisplay::GLASS_COLOR = {0xc7, 0xfe, 0xff, 128};
 const Color BoidsDisplay::BASE_COLOR = BLUE;
 
@@ -82,7 +75,7 @@ void BoidsDisplay::Draw()
     base.Draw();
     baseLabel.Draw();
 
-    Dimensions dims = GetDimsFromBoundingBox(boids.bounds);
+    Vector3 dims = Vector3Subtract(boids.bounds.max, boids.bounds.min);
     Vector3 center = Vector3Add(boids.bounds.min, Vector3Scale(dims, 0.5f));
 
     rlDisableDepthMask();

@@ -6,7 +6,7 @@ namespace PG
 class Cone
 {
 public:
-    // calculate the cone vertices and draw immediately
+    // must be called within rlBegin(RL_TRIANGLES)
     static void DrawWithTriangles(Vector3 pos, Vector3 dir, float radius, float height, u32 slices, Color color);
 };
 

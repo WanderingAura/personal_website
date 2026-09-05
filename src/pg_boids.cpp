@@ -84,10 +84,7 @@ void Boids::UpdateBoidPositions()
         Vector3 meanRepulseDir = {};
         Vector3 meanDir = {};
 
-        // Calculate 3 things:
-        // 1. centre of mass of nearby birds
-        // 2. mean direction of nearby birds
-        // 3. mean direction to go to avoid birds that are too close
+        // accumulate centre of mass, mean direction, and mean repulsion direction of nearby boids
         for (u64 j = 0; j < positions.size() && i != j; j++)
         {
             Vector3 otherBoidPos = positions[j];
@@ -101,8 +98,7 @@ void Boids::UpdateBoidPositions()
                 meanDir = Vector3Add(meanDir, otherBoidDir);
             }
 
-            // NOTE: can probably make a custom collision checker that does both collision checks
-            // at the same time.
+            // TODO: could merge with the vicinity check above into one custom collision test
             bool isTooClose = CheckCollisionSpheres(curBoidPos, params.tooCloseDist, otherBoidPos, params.boidSize);
             if (isTooClose)
             {
@@ -123,8 +119,7 @@ void Boids::UpdateBoidPositions()
             centreOfMass = Vector3Scale(centreOfMass, 1.0f/numInVicinity);
             towardsCenterOfMass = Vector3Subtract(centreOfMass, curBoidPos);
 
-            // NOTE: the further away a boid is, the more it wants to be closer to the flock.
-            // is this actually how flocks work? or should i normalise this vector?
+            // TODO: further boids pull harder towards the flock (unnormalised) - is that right?
             towardsCenterOfMass = Vector3Scale(towardsCenterOfMass, params.cohesionFactor);
 
             meanDir = Vector3Scale(meanDir, params.alignmentFactor / numInVicinity);
@@ -136,17 +131,13 @@ void Boids::UpdateBoidPositions()
         }
 
         dirs[i] = Vector3Add(dirs[i], Vector3Add(towardsCenterOfMass, Vector3Add(meanDir, meanRepulseDir)));
-        
-        // Adjust to avoid bounds
-        // ----------------------------
+
         dirs[i].x = SteerAxisFromBounds(dirs[i].x, curBoidPos.x, bounds.min.x, bounds.max.x, BOUNDS_MARGIN.x, params.boundsAvoidStrength);
         dirs[i].y = SteerAxisFromBounds(dirs[i].y, curBoidPos.y, bounds.min.y, bounds.max.y, BOUNDS_MARGIN.y, params.boundsAvoidStrength);
         dirs[i].z = SteerAxisFromBounds(dirs[i].z, curBoidPos.z, bounds.min.z, bounds.max.z, BOUNDS_MARGIN.z, params.boundsAvoidStrength);
 
         dirs[i] = Vector3ClampValue(dirs[i], 0.02f, 0.2f);
 
-        // Move the boid
-        // ----------------
         float dt = GetFrameTime();
         // clamp dt for the web build
         if (dt > 0.1f)

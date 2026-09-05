@@ -1,6 +1,7 @@
 #include "pg_painting.hpp"
 #include "pg_tooltip.hpp"
 #include "pg_highlight_edge.hpp"
+#include "pg_vector_utils.hpp"
 #include <raymath.h>
 #include <rlgl.h>
 
@@ -45,9 +46,7 @@ Painting::Painting(Vector3 position, Vector3 normal, float size, const char* ima
     tooltipText(tooltipText),
     linkUrl(linkUrl)
 {
-    // arbitrary reference perpendicular-ish to normal, just needs to not be parallel to it
-    Vector3 reference = (fabsf(this->normal.y) > 0.99f) ? Vector3{ 1.0f, 0.0f, 0.0f } : Vector3{ 0.0f, 1.0f, 0.0f };
-    right = Vector3Normalize(Vector3CrossProduct(reference, this->normal));
+    right = Vector3Normalize(Vector3CrossProduct(NonParallelReference(this->normal), this->normal));
     up = Vector3CrossProduct(this->normal, right);
 
     imageTexture = LoadPaintingTexture(imagePath, false);

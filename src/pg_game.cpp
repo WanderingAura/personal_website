@@ -34,15 +34,11 @@ void Game::Initialise()
         gameInstance = new Game;
     }
 
-    // initialise camera position
     gameInstance->cam.position = (Vector3){ 10.0f, 1.0f, 10.0f };
     gameInstance->cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
     gameInstance->cam.up = (Vector3){ 0.0f, 1.0f, 0.0f };
     gameInstance->cam.fovy = 45.0f;
     gameInstance->cam.projection = CAMERA_PERSPECTIVE;
-
-    // initialise cube position
-    gameInstance->cubePos = (Vector3){0.0f, 0.0f, 0.0f};
 
     gameInstance->boidsDisplay.Initialise();
 

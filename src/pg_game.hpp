@@ -9,12 +9,10 @@ namespace PG
     {
     public:
         Camera3D cam;
-        Vector3 cubePos;
         BoidsDisplay boidsDisplay;
         Room room;
         LightingSystem lighting;
         Painting painting;
-    public:
 
         static Game& getInstance();
 

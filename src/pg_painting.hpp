@@ -11,11 +11,9 @@ class Painting
 public:
     Painting() = default;
 
-    // position is the centre of the picture; normal is the direction it faces (e.g. away
-    // from the wall it's mounted on - assumed roughly horizontal, like a wall-mounted
-    // painting); size is the picture's width - its height is derived from imagePath's own
-    // aspect ratio, so the image is scaled without being stretched. If linkUrl is given,
-    // clicking the painting opens it in a new browser tab - web builds only, see Update()
+    // position is the centre of the picture; normal is the direction it faces (e.g. away from
+    // the wall it's mounted on); size is the picture's width - height follows imagePath's own
+    // aspect ratio. If linkUrl is given, clicking the painting opens it in a new tab (web only)
     Painting(Vector3 position, Vector3 normal, float size, const char* imagePath, const char* tooltipText,
         const char* linkUrl = nullptr);
 
@@ -30,10 +28,9 @@ public:
     void Draw() const;
 
     // draws the hover outline, if currently hovered; must be called within BeginMode3D/EndMode3D,
-    // but OUTSIDE any lighting shader scope - it's meant as a flat, always-fully-bright highlight,
-    // and raylib's DrawSphere (used for the outline's rounded joints) applies a scale/translate
-    // via rlPushMatrix/rlScalef that a custom lighting shader can end up misinterpreting for
-    // unrelated geometry drawn afterwards, so it's kept unlit entirely to sidestep that
+    // but OUTSIDE any lighting shader scope - it's an unlit, always-fully-bright highlight, and
+    // drawing it while the room's lighting shader is active was found to corrupt lighting on
+    // unrelated geometry (see LightingSystem::BeginMode/EndMode)
     void DrawHighlight() const;
 
     // draws the tooltip if currently hovered; must be called in 2D (outside of BeginMode3D/EndMode3D)

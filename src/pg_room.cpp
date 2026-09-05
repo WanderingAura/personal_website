@@ -1,5 +1,6 @@
 #include "pg_room.hpp"
 #include "pg_types.hpp"
+#include "pg_vector_utils.hpp"
 #include <rlgl.h>
 #include <raymath.h>
 
@@ -69,9 +70,7 @@ static void DrawTexturedTriangle(Vector3 v0, Vector3 v1, Vector3 v2, Vector2 uv0
 static void DrawTexturedBeam(Vector3 start, Vector3 end, float thickness)
 {
     Vector3 dir = Vector3Normalize(Vector3Subtract(end, start));
-    // arbitrary reference perpendicular-ish to dir, just needs to not be parallel to it
-    Vector3 reference = (fabsf(dir.y) > 0.99f) ? Vector3{ 1.0f, 0.0f, 0.0f } : Vector3{ 0.0f, 1.0f, 0.0f };
-    Vector3 right = Vector3Normalize(Vector3CrossProduct(dir, reference));
+    Vector3 right = Vector3Normalize(Vector3CrossProduct(dir, NonParallelReference(dir)));
     Vector3 up = Vector3CrossProduct(right, dir);
 
     float half = thickness * 0.5f;
