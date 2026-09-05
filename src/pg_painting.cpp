@@ -1,5 +1,6 @@
 #include "pg_painting.hpp"
 #include "pg_tooltip.hpp"
+#include "pg_highlight_edge.hpp"
 #include <raymath.h>
 #include <rlgl.h>
 
@@ -18,6 +19,11 @@ static const constexpr float FRAME_DEPTH = 0.1f;
 static const constexpr float FRAME_TEXTURE_TILE_SIZE = 0.5f;
 // how far off the wall to draw the picture/frame's back, so they don't z-fight with it
 static const constexpr float SURFACE_OFFSET = 0.01f;
+// world-space thickness of the hover outline edges, matching HoverableBox's. GL line width
+// (rlSetLineWidth) can't be used for this - most desktop core-profile drivers and WebGL clamp
+// it to 1px regardless of the requested value - so the outline is built from real geometry
+// (see DrawHighlightEdge) instead.
+static const constexpr float HOVER_OUTLINE_THICKNESS = 0.06f;
 
 static Texture2D LoadPaintingTexture(const char* path, bool tiled)
 {
@@ -50,7 +56,7 @@ Painting::Painting(Vector3 position, Vector3 normal, float size, const char* ima
     frameTexture = LoadPaintingTexture(FRAME_TEXTURE_PATH, true);
 }
 
-void Painting::Update(Ray ray)
+void Painting::GetOuterCorners(Vector3& bl, Vector3& br, Vector3& tr, Vector3& tl) const
 {
     float frameThickness = width * FRAME_THICKNESS_FRACTION;
     float outerWidth = width + frameThickness * 2.0f;
@@ -59,10 +65,16 @@ void Painting::Update(Ray ray)
     Vector3 halfRight = Vector3Scale(right, outerWidth * 0.5f);
     Vector3 halfUp = Vector3Scale(up, outerHeight * 0.5f);
 
-    Vector3 bl = Vector3Subtract(Vector3Subtract(position, halfRight), halfUp);
-    Vector3 br = Vector3Subtract(Vector3Add(position, halfRight), halfUp);
-    Vector3 tr = Vector3Add(Vector3Add(position, halfRight), halfUp);
-    Vector3 tl = Vector3Add(Vector3Subtract(position, halfRight), halfUp);
+    bl = Vector3Subtract(Vector3Subtract(position, halfRight), halfUp);
+    br = Vector3Subtract(Vector3Add(position, halfRight), halfUp);
+    tr = Vector3Add(Vector3Add(position, halfRight), halfUp);
+    tl = Vector3Add(Vector3Subtract(position, halfRight), halfUp);
+}
+
+void Painting::Update(Ray ray)
+{
+    Vector3 bl, br, tr, tl;
+    GetOuterCorners(bl, br, tr, tl);
 
     RayCollision collision = GetRayCollisionQuad(ray, bl, br, tr, tl);
     isHovered = collision.hit;
@@ -155,6 +167,25 @@ void Painting::Draw() const
         DrawFrameBox(rightCenter, right, up, normal, frameThickness, height, FRAME_DEPTH, FRAME_TEXTURE_TILE_SIZE);
     rlEnd();
     rlSetTexture(0);
+}
+
+void Painting::DrawHighlight() const
+{
+    if (!isHovered) return;
+
+    // outline the frame's raised front face, since that's the surface closest to the camera
+    Vector3 bl, br, tr, tl;
+    GetOuterCorners(bl, br, tr, tl);
+    Vector3 frontOffset = Vector3Scale(normal, FRAME_DEPTH);
+    bl = Vector3Add(bl, frontOffset);
+    br = Vector3Add(br, frontOffset);
+    tr = Vector3Add(tr, frontOffset);
+    tl = Vector3Add(tl, frontOffset);
+
+    DrawHighlightEdge(bl, br, HOVER_OUTLINE_THICKNESS, WHITE);
+    DrawHighlightEdge(br, tr, HOVER_OUTLINE_THICKNESS, WHITE);
+    DrawHighlightEdge(tr, tl, HOVER_OUTLINE_THICKNESS, WHITE);
+    DrawHighlightEdge(tl, bl, HOVER_OUTLINE_THICKNESS, WHITE);
 }
 
 void Painting::DrawTooltip() const

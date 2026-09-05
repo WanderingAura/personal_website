@@ -42,6 +42,10 @@ u32 LightingSystem::AddLight(LightType type, Vector3 position, Vector3 target, C
     light.targetLoc   = GetShaderLocation(shader, TextFormat("lights[%i].target", index));
     light.colorLoc    = GetShaderLocation(shader, TextFormat("lights[%i].color", index));
 
+    TraceLog(LOG_INFO, "[DEBUG] light %i added: type=%s pos=(%.2f, %.2f, %.2f) color=(%d,%d,%d,%d)",
+        index, (type == LightType::Point) ? "Point" : "Directional",
+        position.x, position.y, position.z, color.r, color.g, color.b, color.a);
+
     return index;
 }
 

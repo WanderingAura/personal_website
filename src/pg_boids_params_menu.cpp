@@ -1,5 +1,4 @@
 #include "pg_boids_params_menu.hpp"
-#include "pg_resume_prompt.hpp"
 
 namespace PG
 {
@@ -10,6 +9,9 @@ static const constexpr float TITLE_HEIGHT = 30.0f;
 static const constexpr float ROW_HEIGHT = 45.0f;
 static const constexpr float TRACK_HEIGHT = 18.0f;
 static const constexpr int TITLE_FONT_SIZE = 20;
+static const constexpr float CLOSE_BUTTON_SIZE = 24.0f;
+static const constexpr float CLOSE_BUTTON_MARGIN = 10.0f;
+static const constexpr int CLOSE_BUTTON_FONT_SIZE = 18;
 
 struct SliderSpec
 {
@@ -27,6 +29,13 @@ BoidsParamsMenu::BoidsParamsMenu(BoidsParams& params)
         (GetScreenHeight() - menuHeight) / 2.0f,
         MENU_WIDTH,
         menuHeight,
+    };
+
+    closeButtonBounds = Rectangle{
+        bounds.x + bounds.width - CLOSE_BUTTON_MARGIN - CLOSE_BUTTON_SIZE,
+        bounds.y + CLOSE_BUTTON_MARGIN,
+        CLOSE_BUTTON_SIZE,
+        CLOSE_BUTTON_SIZE,
     };
 
     float trackX = bounds.x + PADDING;
@@ -53,7 +62,7 @@ BoidsParamsMenu::BoidsParamsMenu(BoidsParams& params)
 
 void BoidsParamsMenu::Open()
 {
-    state = State::Open;
+    isOpen = true;
     EnableCursor();
     // DisableCursor()'s virtual mouse position drifts unbounded while active, so the cursor
     // can reappear somewhere unexpected; re-centre it so it always starts inside the menu
@@ -62,42 +71,20 @@ void BoidsParamsMenu::Open()
 
 void BoidsParamsMenu::Close()
 {
-#if defined(PLATFORM_WEB)
-    // Emscripten's cursor-disable path only (re-)acquires browser pointer-lock from within
-    // a genuine click event on the canvas - calling DisableCursor() here would fire its lock
-    // request outside of one (this "close" was detected by polling, a frame after the actual
-    // click/key event fired) and silently fail, leaving the OS cursor visible and desynced
-    // from raylib's now-"disabled" cursor state, exactly like the reported bug. So wait for
-    // one more real click before calling DisableCursor() - see AwaitingRelock in Update().
-    state = State::AwaitingRelock;
-#else
-    state = State::Closed;
+    isOpen = false;
     DisableCursor();
-#endif
 }
 
 bool BoidsParamsMenu::IsOpen() const
 {
-    return state != State::Closed;
+    return isOpen;
 }
 
 void BoidsParamsMenu::Update()
 {
-#if defined(PLATFORM_WEB)
-    if (state == State::AwaitingRelock)
-    {
-        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
-        {
-            state = State::Closed;
-            DisableCursor();
-        }
-        return;
-    }
-#endif
+    if (!isOpen) return;
 
-    if (state != State::Open) return;
-
-    if (IsKeyPressed(KEY_ESCAPE))
+    if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), closeButtonBounds))
     {
         Close();
         return;
@@ -117,15 +104,7 @@ void BoidsParamsMenu::Update()
 
 void BoidsParamsMenu::Draw() const
 {
-#if defined(PLATFORM_WEB)
-    if (state == State::AwaitingRelock)
-    {
-        ResumePrompt::Draw();
-        return;
-    }
-#endif
-
-    if (state != State::Open) return;
+    if (!isOpen) return;
 
     DrawRectangleRec(bounds, Fade(BLACK, 0.85f));
     DrawRectangleLinesEx(bounds, 2.0f, WHITE);
@@ -133,6 +112,15 @@ void BoidsParamsMenu::Draw() const
     const char* title = "Boids Parameters";
     int titleWidth = MeasureText(title, TITLE_FONT_SIZE);
     DrawText(title, (int)(bounds.x + (bounds.width - titleWidth) / 2.0f), (int)(bounds.y + PADDING / 2.0f), TITLE_FONT_SIZE, WHITE);
+
+    DrawRectangleRec(closeButtonBounds, Fade(WHITE, 0.15f));
+    DrawRectangleLinesEx(closeButtonBounds, 1.0f, WHITE);
+    const char* closeLabel = "X";
+    int closeLabelWidth = MeasureText(closeLabel, CLOSE_BUTTON_FONT_SIZE);
+    DrawText(closeLabel,
+        (int)(closeButtonBounds.x + (closeButtonBounds.width - closeLabelWidth) / 2.0f),
+        (int)(closeButtonBounds.y + (closeButtonBounds.height - CLOSE_BUTTON_FONT_SIZE) / 2.0f),
+        CLOSE_BUTTON_FONT_SIZE, WHITE);
 
     for (u32 i = 0; i < NUM_SLIDERS; i++)
     {

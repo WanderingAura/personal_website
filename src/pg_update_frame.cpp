@@ -28,6 +28,16 @@ static bool quitRequested = false;
 // BoidsParamsMenu's own AwaitingRelock state, which covers the menu-close path.
 static bool awaitingRelock = false;
 
+#if defined(PLATFORM_WEB)
+static bool wasMenuOpen = false;
+// while GetTime() < this, skip the pointer-lock-status check below: the browser grants a
+// (re-)lock request asynchronously, so checking immediately after one (e.g. right as the
+// menu closes and calls DisableCursor() itself) can see "not locked yet" and incorrectly
+// flag a lost-focus state even though the lock is about to succeed fine
+static double lockGraceUntil = 0.0;
+static const constexpr double LOCK_GRACE_PERIOD = 0.5;
+#endif
+
 void UpdateDrawFrame(void)
 {
     Game& game = Game::getInstance();
@@ -37,15 +47,31 @@ void UpdateDrawFrame(void)
     bool menuOpen = game.boidsDisplay.IsMenuOpen();
 
 #if defined(PLATFORM_WEB)
+    // BoidsParamsMenu::Close() already called DisableCursor() itself when the menu just
+    // closed; start the grace period here too so the status check below doesn't fire before
+    // that (asynchronous) relock has had a chance to actually succeed
+    if (wasMenuOpen && !menuOpen)
+    {
+        lockGraceUntil = GetTime() + LOCK_GRACE_PERIOD;
+    }
+    wasMenuOpen = menuOpen;
+
+    // snapshot before the block below can flip awaitingRelock false this same frame - the click
+    // that resolves it must still count as "not cursor-locked yet" this frame (see cursorLocked
+    // below), otherwise that same still-true IsMouseButtonPressed() would also be seen by
+    // game.painting.Update() as a fresh click and immediately re-trigger its hyperlink
+    bool wasAwaitingRelock = awaitingRelock;
+
     if (awaitingRelock)
     {
         if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
         {
             awaitingRelock = false;
             DisableCursor();
+            lockGraceUntil = GetTime() + LOCK_GRACE_PERIOD;
         }
     }
-    else if (!menuOpen)
+    else if (!menuOpen && GetTime() >= lockGraceUntil)
     {
         EmscriptenPointerlockChangeEvent status;
         emscripten_get_pointerlock_status(&status);
@@ -62,15 +88,16 @@ void UpdateDrawFrame(void)
     {
         quitRequested = true;
     }
+    bool wasAwaitingRelock = awaitingRelock;
 #endif
 
-    bool cursorLocked = !menuOpen && !awaitingRelock;
+    bool cursorLocked = !menuOpen && !wasAwaitingRelock;
 
     if (cursorLocked)
     {
         UpdateCamera(&game.cam, CAMERA_FREE);
     }
-    if (!awaitingRelock)
+    if (!wasAwaitingRelock)
     {
         game.boidsDisplay.Update(game.cam);
     }
@@ -78,6 +105,23 @@ void UpdateDrawFrame(void)
     if (cursorLocked)
     {
         game.painting.Update(Crosshair::GetPickRay(game.cam));
+    }
+
+    // temporary: log camera position/orientation whenever painting hover toggles, to check
+    // whether reported lighting changes near the painting actually correlate with hover state
+    // or just with standing in that spot (the shader/light setup is otherwise untouched by hover -
+    // see Painting::Update()/Draw(), neither of which reference LightingSystem at all)
+    {
+        static bool wasPaintingHovered = false;
+        bool paintingHoveredNow = game.painting.IsHovered();
+        if (paintingHoveredNow != wasPaintingHovered)
+        {
+            TraceLog(LOG_INFO, "[DEBUG] painting hover %s | camPos=(%.2f, %.2f, %.2f) camTarget=(%.2f, %.2f, %.2f)",
+                paintingHoveredNow ? "ON" : "OFF",
+                game.cam.position.x, game.cam.position.y, game.cam.position.z,
+                game.cam.target.x, game.cam.target.y, game.cam.target.z);
+            wasPaintingHovered = paintingHoveredNow;
+        }
     }
 
     if (cursorLocked && IsKeyPressed(KEY_Z)) game.cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
@@ -90,6 +134,7 @@ void UpdateDrawFrame(void)
                 game.painting.Draw();
             game.lighting.EndMode();
             game.boidsDisplay.Draw();
+            game.painting.DrawHighlight();
         EndMode3D();
 
         if (cursorLocked)

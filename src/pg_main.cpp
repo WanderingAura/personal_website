@@ -19,9 +19,9 @@ int main()
     //--------------------------------------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "Personal Gallery");
 
-    // ESC is used to close the boids params menu, not just to quit; the default exit key
-    // would quit unconditionally on Esc regardless of the menu, so it's disabled here and
-    // PG::ShouldQuit() (below) does the equivalent check but only when the menu isn't open
+    // the default exit key (Esc) would quit unconditionally, including while the boids params
+    // menu is open (which closes via its own X button/click-outside, not Esc); disable it here
+    // and let PG::ShouldQuit() (below) do the equivalent check only when the menu isn't open
     SetExitKey(KEY_NULL);
 
     DisableCursor();
