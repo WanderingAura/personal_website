@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
     pg_boids_params_menu.cpp
     pg_box_label.cpp
     pg_painting.cpp
+    pg_resume_prompt.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} raylib m)

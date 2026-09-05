@@ -17,9 +17,13 @@ Game& Game::getInstance()
 }
 
 Game::Game() :
-    boidsDisplay(BOIDS_NUM, Vector3{0,0}, 3.0f, BoidsParams{}),
+    // moved next to the painting on the back wall (see `painting` below)
+    boidsDisplay(BOIDS_NUM, Vector3{3.0f, 0.0f, -9.0f}, 3.0f, BoidsParams{}),
     room(Vector3{0,0,0}, Vector3{24.0f, 8.0f, 24.0f}, "assets/stair_planks_diff_1k.jpg", "assets/japanese_cedar_planks_diff_1k.jpg",
-         "assets/white_stucco_ao_1k.jpg", "assets/bark_willow_diff_1k.jpg", 10.0f)
+         "assets/white_stucco_ao_1k.jpg", "assets/bark_willow_diff_1k.jpg", 10.0f),
+    // on the back wall (z = -12), facing +Z into the room like the wall's own normal
+    painting(Vector3{-3.0f, 4.0f, -12.0f}, Vector3{0.0f, 0.0f, 1.0f}, 4.0f, "assets/recollections_game.png", "Recollections - a game I made",
+        "https://benskca.itch.io/recollections")
 {
 }
 

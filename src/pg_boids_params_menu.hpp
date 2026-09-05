@@ -21,7 +21,14 @@ public:
     explicit BoidsParamsMenu(BoidsParams& params);
 
     void Open();
+
+    // begins closing the menu; on desktop this immediately re-locks the cursor, but on web
+    // it first enters an "awaiting relock" state (see State) that Update() resolves once the
+    // user clicks again
     void Close();
+
+    // true while the menu's sliders are shown OR (web only) while awaiting the resume-click;
+    // callers should treat both the same - camera look/movement should stay frozen throughout
     bool IsOpen() const;
 
     // handles slider dragging and the esc/click-outside-to-close gestures; no-ops when closed
@@ -33,7 +40,13 @@ public:
 private:
     static const constexpr u32 NUM_SLIDERS = 6;
 
-    bool isOpen = false;
+    // Open: sliders active. AwaitingRelock (web builds only): menu just closed but the OS
+    // cursor is still visible, waiting for one more click before re-enabling the locked
+    // cursor - browsers only grant pointer-lock re-acquisition from within a genuine click
+    // event, so re-locking the instant the menu closes is unreliable (see pg_boids_params_menu.cpp).
+    enum class State { Closed, Open, AwaitingRelock };
+
+    State state = State::Closed;
     Rectangle bounds{};
     Slider sliders[NUM_SLIDERS];
 };

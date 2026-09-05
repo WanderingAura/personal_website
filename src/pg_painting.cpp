@@ -3,14 +3,20 @@
 #include <raymath.h>
 #include <rlgl.h>
 
+#if defined(PLATFORM_WEB)
+#include <emscripten/emscripten.h>
+#endif
+
 namespace PG
 {
 
 static const constexpr char* FRAME_TEXTURE_PATH = "assets/bark_willow_diff_1k.jpg";
 static const constexpr float FRAME_THICKNESS_FRACTION = 0.08f;
+// how far the frame sticks out from the wall, in world units
+static const constexpr float FRAME_DEPTH = 0.1f;
 // world units per texture repeat for the frame's wood grain
 static const constexpr float FRAME_TEXTURE_TILE_SIZE = 0.5f;
-// how far off the wall to draw the picture/frame, so they don't z-fight with it
+// how far off the wall to draw the picture/frame's back, so they don't z-fight with it
 static const constexpr float SURFACE_OFFSET = 0.01f;
 
 static Texture2D LoadPaintingTexture(const char* path, bool tiled)
@@ -25,11 +31,13 @@ static Texture2D LoadPaintingTexture(const char* path, bool tiled)
     return texture;
 }
 
-Painting::Painting(Vector3 position, Vector3 normal, float size, const char* imagePath, const char* tooltipText) :
+Painting::Painting(Vector3 position, Vector3 normal, float size, const char* imagePath, const char* tooltipText,
+    const char* linkUrl) :
     position(position),
     normal(Vector3Normalize(normal)),
     width(size),
-    tooltipText(tooltipText)
+    tooltipText(tooltipText),
+    linkUrl(linkUrl)
 {
     // arbitrary reference perpendicular-ish to normal, just needs to not be parallel to it
     Vector3 reference = (fabsf(this->normal.y) > 0.99f) ? Vector3{ 1.0f, 0.0f, 0.0f } : Vector3{ 0.0f, 1.0f, 0.0f };
@@ -58,6 +66,13 @@ void Painting::Update(Ray ray)
 
     RayCollision collision = GetRayCollisionQuad(ray, bl, br, tr, tl);
     isHovered = collision.hit;
+
+    if (isHovered && linkUrl && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+    {
+#if defined(PLATFORM_WEB)
+        EM_ASM({ window.open(UTF8ToString($0), '_blank'); }, linkUrl);
+#endif
+    }
 }
 
 // emits one quad into the active RL_QUADS batch, centred at `center` and spanning `width`
@@ -81,6 +96,33 @@ static void DrawFlatQuad(Vector3 center, Vector3 right, Vector3 up, float width,
     rlTexCoord2f(0.0f, 0.0f); rlVertex3f(tl.x, tl.y, tl.z);
 }
 
+// Draws a box sticking out of the wall by `depth` along `normal`, with `backCenter` as the
+// face flush against the wall - i.e. the box spans normal from 0 (at the wall) to depth (its
+// raised front). Right x up must equal normal. The back face is omitted since it's flush
+// against the wall and never visible.
+static void DrawFrameBox(Vector3 backCenter, Vector3 right, Vector3 up, Vector3 normal,
+    float width, float height, float depth, float tileSize)
+{
+    Vector3 boxCenter = Vector3Add(backCenter, Vector3Scale(normal, depth * 0.5f));
+
+    Vector3 frontCenter = Vector3Add(boxCenter, Vector3Scale(normal, depth * 0.5f));
+    DrawFlatQuad(frontCenter, right, up, width, height, normal, width / tileSize, height / tileSize);
+
+    // for each side face, the two axes passed as (right,up) to DrawFlatQuad are chosen so
+    // their cross product equals that face's own outward normal (see DrawFlatQuad's contract)
+    Vector3 topCenter = Vector3Add(boxCenter, Vector3Scale(up, height * 0.5f));
+    DrawFlatQuad(topCenter, normal, right, depth, width, up, depth / tileSize, width / tileSize);
+
+    Vector3 bottomCenter = Vector3Subtract(boxCenter, Vector3Scale(up, height * 0.5f));
+    DrawFlatQuad(bottomCenter, right, normal, width, depth, Vector3Negate(up), width / tileSize, depth / tileSize);
+
+    Vector3 leftCenter = Vector3Subtract(boxCenter, Vector3Scale(right, width * 0.5f));
+    DrawFlatQuad(leftCenter, normal, up, depth, height, Vector3Negate(right), depth / tileSize, height / tileSize);
+
+    Vector3 rightCenter = Vector3Add(boxCenter, Vector3Scale(right, width * 0.5f));
+    DrawFlatQuad(rightCenter, up, normal, height, depth, right, height / tileSize, depth / tileSize);
+}
+
 void Painting::Draw() const
 {
     Vector3 surfacePos = Vector3Add(position, Vector3Scale(normal, SURFACE_OFFSET));
@@ -101,20 +143,16 @@ void Painting::Draw() const
         // top/bottom strips span the full outer width (so they cover the corners); left/right
         // strips just fill the remaining height between them - a simple non-mitred frame
         Vector3 topCenter = Vector3Add(surfacePos, Vector3Scale(up, (height + frameThickness) * 0.5f));
-        DrawFlatQuad(topCenter, right, up, outerWidth, frameThickness, normal,
-            outerWidth / FRAME_TEXTURE_TILE_SIZE, frameThickness / FRAME_TEXTURE_TILE_SIZE);
+        DrawFrameBox(topCenter, right, up, normal, outerWidth, frameThickness, FRAME_DEPTH, FRAME_TEXTURE_TILE_SIZE);
 
         Vector3 bottomCenter = Vector3Subtract(surfacePos, Vector3Scale(up, (height + frameThickness) * 0.5f));
-        DrawFlatQuad(bottomCenter, right, up, outerWidth, frameThickness, normal,
-            outerWidth / FRAME_TEXTURE_TILE_SIZE, frameThickness / FRAME_TEXTURE_TILE_SIZE);
+        DrawFrameBox(bottomCenter, right, up, normal, outerWidth, frameThickness, FRAME_DEPTH, FRAME_TEXTURE_TILE_SIZE);
 
         Vector3 leftCenter = Vector3Subtract(surfacePos, Vector3Scale(right, (width + frameThickness) * 0.5f));
-        DrawFlatQuad(leftCenter, right, up, frameThickness, height, normal,
-            frameThickness / FRAME_TEXTURE_TILE_SIZE, height / FRAME_TEXTURE_TILE_SIZE);
+        DrawFrameBox(leftCenter, right, up, normal, frameThickness, height, FRAME_DEPTH, FRAME_TEXTURE_TILE_SIZE);
 
         Vector3 rightCenter = Vector3Add(surfacePos, Vector3Scale(right, (width + frameThickness) * 0.5f));
-        DrawFlatQuad(rightCenter, right, up, frameThickness, height, normal,
-            frameThickness / FRAME_TEXTURE_TILE_SIZE, height / FRAME_TEXTURE_TILE_SIZE);
+        DrawFrameBox(rightCenter, right, up, normal, frameThickness, height, FRAME_DEPTH, FRAME_TEXTURE_TILE_SIZE);
     rlEnd();
     rlSetTexture(0);
 }

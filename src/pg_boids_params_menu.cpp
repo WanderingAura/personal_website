@@ -1,4 +1,5 @@
 #include "pg_boids_params_menu.hpp"
+#include "pg_resume_prompt.hpp"
 
 namespace PG
 {
@@ -52,7 +53,7 @@ BoidsParamsMenu::BoidsParamsMenu(BoidsParams& params)
 
 void BoidsParamsMenu::Open()
 {
-    isOpen = true;
+    state = State::Open;
     EnableCursor();
     // DisableCursor()'s virtual mouse position drifts unbounded while active, so the cursor
     // can reappear somewhere unexpected; re-centre it so it always starts inside the menu
@@ -61,18 +62,40 @@ void BoidsParamsMenu::Open()
 
 void BoidsParamsMenu::Close()
 {
-    isOpen = false;
+#if defined(PLATFORM_WEB)
+    // Emscripten's cursor-disable path only (re-)acquires browser pointer-lock from within
+    // a genuine click event on the canvas - calling DisableCursor() here would fire its lock
+    // request outside of one (this "close" was detected by polling, a frame after the actual
+    // click/key event fired) and silently fail, leaving the OS cursor visible and desynced
+    // from raylib's now-"disabled" cursor state, exactly like the reported bug. So wait for
+    // one more real click before calling DisableCursor() - see AwaitingRelock in Update().
+    state = State::AwaitingRelock;
+#else
+    state = State::Closed;
     DisableCursor();
+#endif
 }
 
 bool BoidsParamsMenu::IsOpen() const
 {
-    return isOpen;
+    return state != State::Closed;
 }
 
 void BoidsParamsMenu::Update()
 {
-    if (!isOpen) return;
+#if defined(PLATFORM_WEB)
+    if (state == State::AwaitingRelock)
+    {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            state = State::Closed;
+            DisableCursor();
+        }
+        return;
+    }
+#endif
+
+    if (state != State::Open) return;
 
     if (IsKeyPressed(KEY_ESCAPE))
     {
@@ -94,7 +117,15 @@ void BoidsParamsMenu::Update()
 
 void BoidsParamsMenu::Draw() const
 {
-    if (!isOpen) return;
+#if defined(PLATFORM_WEB)
+    if (state == State::AwaitingRelock)
+    {
+        ResumePrompt::Draw();
+        return;
+    }
+#endif
+
+    if (state != State::Open) return;
 
     DrawRectangleRec(bounds, Fade(BLACK, 0.85f));
     DrawRectangleLinesEx(bounds, 2.0f, WHITE);

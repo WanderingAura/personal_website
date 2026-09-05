@@ -2,6 +2,7 @@
 #include "pg_boids_display.hpp"
 #include "pg_room.hpp"
 #include "pg_lighting.hpp"
+#include "pg_painting.hpp"
 namespace PG
 {
     class Game
@@ -12,6 +13,7 @@ namespace PG
         BoidsDisplay boidsDisplay;
         Room room;
         LightingSystem lighting;
+        Painting painting;
     public:
 
         static Game& getInstance();
