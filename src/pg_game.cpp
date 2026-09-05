@@ -16,7 +16,8 @@ Game& Game::getInstance()
 }
 
 Game::Game() :
-    boidsDisplay(BOIDS_NUM, Vector3{0,0}, 5, BoidsParams{})
+    boidsDisplay(BOIDS_NUM, Vector3{0,0}, 5, BoidsParams{}),
+    room(Vector3{0,0,0}, Vector3{24.0f, 8.0f, 24.0f}, "assets/stair_planks_diff_4k.jpg", "assets/japanese_cedar_planks_diff_4k.jpg")
 {
 }
 

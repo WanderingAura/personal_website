@@ -11,16 +11,15 @@ struct BoidsParams
     float tooCloseDist  = 1.2f;
     float boidSize      = 0.3f;
 
-    // How strongly a boid steers away from the bounds once inside boundsAvoidMargin of an
-    // edge, as a 0..1 blend factor applied right at the edge (ramps up from 0 as the boid
-    // gets closer). 1 means the direction is fully turned around by the time it reaches the edge.
+    float boidSizeFraction      = 0.04f;
+    // the speed at which the boid steers away from the bounds
     float boundsAvoidStrength = 0.5f;
 
-    float cohesionFactor  = 0.01f;
-    float alignmentFactor = 0.01f;
+    float cohesionFactor  = 0.02f;
+    float alignmentFactor = 0.02f;
     float repulsionFactor = 0.025f;
 
-    float speed = 45.0f;
+    float speed = 30.0f;
 };
 
 class Boids

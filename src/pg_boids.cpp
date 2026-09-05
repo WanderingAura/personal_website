@@ -7,10 +7,6 @@
 namespace PG
 {
 
-// Steers dirComponent away from whichever edge it is within margin of. The steering
-// strength ramps up (quadratically) from 0 at the edge of the margin zone to
-// boundsAvoidStrength right at the wall, so it reverses direction before crossing rather
-// than a constant nudge that only starts once already at the wall.
 static float SteerAxisFromBounds(float dirComponent, float pos, float minBound, float maxBound, float margin, float boundsAvoidStrength)
 {
     float distFromMin = pos - minBound;

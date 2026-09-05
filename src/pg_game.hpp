@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "pg_boids_display.hpp"
+#include "pg_room.hpp"
 namespace PG
 {
     class Game
@@ -8,6 +9,7 @@ namespace PG
         Camera3D cam;
         Vector3 cubePos;
         BoidsDisplay boidsDisplay;
+        Room room;
     public:
 
         static Game& getInstance();
