@@ -90,7 +90,7 @@ void UpdateDrawFrame(void)
 
     if (cursorLocked)
     {
-        UpdateCamera(&game.cam, CAMERA_FREE);
+        UpdateCamera(&game.cam, CAMERA_FIRST_PERSON);
     }
     if (!wasAwaitingRelock)
     {
