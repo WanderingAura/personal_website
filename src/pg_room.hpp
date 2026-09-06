@@ -1,7 +1,10 @@
+#pragma once
 #include "raylib.h"
 
 namespace PG
 {
+
+class CollisionSystem;
 
 // A cuboid room (floor + 4 walls, open top) with a square-based pyramid roof, built from
 // textured quads/triangles whose normals face inward (walls/floor) or outward+up (roof). The
@@ -19,6 +22,10 @@ public:
 
     // must be called within BeginMode3D/EndMode3D
     void Draw() const;
+
+    // registers the room's 4 walls (as thin rectangles along each wall's own plane) with the
+    // given collision system, so the player can't walk through them; call once after construction
+    void RegisterCollisions(CollisionSystem& collisionSystem) const;
 
 private:
     Vector3 position;

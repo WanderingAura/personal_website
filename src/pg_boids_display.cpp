@@ -1,5 +1,6 @@
 #include "pg_boids_display.hpp"
 #include "pg_crosshair.hpp"
+#include "pg_collision.hpp"
 #include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
@@ -41,6 +42,11 @@ BoidsDisplay::BoidsDisplay(u32 numBoids, Vector3 position, float size, const Boi
 void BoidsDisplay::Initialise()
 {
     boids.InitialiseBoids();
+}
+
+void BoidsDisplay::RegisterCollisions(CollisionSystem& collisionSystem) const
+{
+    collisionSystem.RegisterCollidable({ pos.x - size / 2, pos.x + size / 2, pos.z - size / 2, pos.z + size / 2 });
 }
 
 void BoidsDisplay::Update(Camera3D cam)

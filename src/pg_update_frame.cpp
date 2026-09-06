@@ -91,6 +91,14 @@ void UpdateDrawFrame(void)
     if (cursorLocked)
     {
         UpdateCamera(&game.cam, CAMERA_FIRST_PERSON);
+
+        // push the camera back out of anything it walked into; shift target by the same amount
+        // so the correction doesn't also snap the look direction (UpdateCamera keeps target at
+        // a fixed offset from position to represent where the camera's looking)
+        Vector3 beforeCollision = game.cam.position;
+        game.collisionSystem.ResolvePosition(game.cam.position);
+        Vector3 correction = Vector3Subtract(game.cam.position, beforeCollision);
+        game.cam.target = Vector3Add(game.cam.target, correction);
     }
     if (!wasAwaitingRelock)
     {

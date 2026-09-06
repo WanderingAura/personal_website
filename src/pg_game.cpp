@@ -48,6 +48,9 @@ void Game::Initialise()
 
     gameInstance->lighting.Initialise();
     gameInstance->lighting.AddLight(LightType::Point, Vector3{ 0.0f, 4.0f, 0.0f }, Vector3Zero(), WHITE);
+
+    gameInstance->room.RegisterCollisions(gameInstance->collisionSystem);
+    gameInstance->boidsDisplay.RegisterCollisions(gameInstance->collisionSystem);
 }
 
 void Game::Shutdown()

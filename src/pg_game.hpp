@@ -1,8 +1,10 @@
+#pragma once
 #include "raylib.h"
 #include "pg_boids_display.hpp"
 #include "pg_room.hpp"
 #include "pg_lighting.hpp"
 #include "pg_painting.hpp"
+#include "pg_collision.hpp"
 namespace PG
 {
     class Game
@@ -14,6 +16,7 @@ namespace PG
         LightingSystem lighting;
         Painting painting;
         Painting dragonPainting;
+        CollisionSystem collisionSystem;
 
         static Game& getInstance();
 

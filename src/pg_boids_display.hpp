@@ -1,9 +1,12 @@
+#pragma once
 #include "pg_boids.hpp"
 #include "pg_hoverable_box.hpp"
 #include "pg_boids_params_menu.hpp"
 #include "pg_box_label.hpp"
 namespace PG
 {
+
+class CollisionSystem;
 
 class BoidsDisplay
 {
@@ -16,6 +19,10 @@ public:
 
     // draws the case and its contents; must be called within BeginMode3D/EndMode3D
     void Draw();
+
+    // registers the base's footprint with the given collision system, so the player can't walk
+    // into it; call once after construction
+    void RegisterCollisions(CollisionSystem& collisionSystem) const;
 
     // draws a tooltip if the base is hovered; must be called in 2D (outside of BeginMode3D/EndMode3D)
     void DrawTooltip();

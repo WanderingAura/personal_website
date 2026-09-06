@@ -1,6 +1,7 @@
 #include "pg_room.hpp"
 #include "pg_types.hpp"
 #include "pg_vector_utils.hpp"
+#include "pg_collision.hpp"
 #include <rlgl.h>
 #include <raymath.h>
 
@@ -40,6 +41,19 @@ Room::Room(Vector3 position, Vector3 size, const char* wallTexturePath, const ch
     roofTexture(LoadTiledTexture(roofTexturePath)),
     beamTexture(LoadTiledTexture(beamTexturePath))
 {
+}
+
+void Room::RegisterCollisions(CollisionSystem& collisionSystem) const
+{
+    float minX = position.x - size.x / 2;
+    float maxX = position.x + size.x / 2;
+    float minZ = position.z - size.z / 2;
+    float maxZ = position.z + size.z / 2;
+
+    collisionSystem.RegisterCollidable({ minX, maxX, minZ, minZ }); // back wall
+    collisionSystem.RegisterCollidable({ minX, maxX, maxZ, maxZ }); // front wall
+    collisionSystem.RegisterCollidable({ minX, minX, minZ, maxZ }); // left wall
+    collisionSystem.RegisterCollidable({ maxX, maxX, minZ, maxZ }); // right wall
 }
 
 // emits one quad into the active RL_QUADS batch; corners must be wound so the desired normal
