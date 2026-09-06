@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
     pg_painting.cpp
     pg_resume_prompt.cpp
     pg_highlight_edge.cpp
+    pg_video_texture.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} raylib m)

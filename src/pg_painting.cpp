@@ -39,7 +39,7 @@ static Texture2D LoadPaintingTexture(const char* path, bool tiled)
 }
 
 Painting::Painting(Vector3 position, Vector3 normal, float size, const char* imagePath, const char* tooltipText,
-    const char* linkUrl) :
+    const char* linkUrl, const char* videoPath) :
     position(position),
     normal(Vector3Normalize(normal)),
     width(size),
@@ -53,6 +53,8 @@ Painting::Painting(Vector3 position, Vector3 normal, float size, const char* ima
     height = size * ((float)imageTexture.height / (float)imageTexture.width);
 
     frameTexture = LoadPaintingTexture(FRAME_TEXTURE_PATH, true);
+
+    video = VideoTexture(videoPath, imageTexture);
 }
 
 void Painting::GetOuterCorners(Vector3& bl, Vector3& br, Vector3& tr, Vector3& tl) const
@@ -77,6 +79,11 @@ void Painting::Update(Ray ray)
 
     RayCollision collision = GetRayCollisionQuad(ray, bl, br, tr, tl);
     isHovered = collision.hit;
+
+    if (isHovered && !wasHovered) video.Play();
+    else if (!isHovered && wasHovered) video.Pause();
+    wasHovered = isHovered;
+    video.Update();
 
     if (isHovered && linkUrl && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
     {

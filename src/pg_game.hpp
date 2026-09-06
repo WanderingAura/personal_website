@@ -13,6 +13,7 @@ namespace PG
         Room room;
         LightingSystem lighting;
         Painting painting;
+        Painting dragonPainting;
 
         static Game& getInstance();
 

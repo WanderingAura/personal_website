@@ -99,7 +99,9 @@ void UpdateDrawFrame(void)
     game.lighting.Update(game.cam);
     if (cursorLocked)
     {
-        game.painting.Update(Crosshair::GetPickRay(game.cam));
+        Ray pickRay = Crosshair::GetPickRay(game.cam);
+        game.painting.Update(pickRay);
+        game.dragonPainting.Update(pickRay);
     }
 
     if (cursorLocked && IsKeyPressed(KEY_Z)) game.cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
@@ -110,9 +112,11 @@ void UpdateDrawFrame(void)
             game.lighting.BeginMode();
                 game.room.Draw();
                 game.painting.Draw();
+                game.dragonPainting.Draw();
             game.lighting.EndMode();
             game.boidsDisplay.Draw();
             game.painting.DrawHighlight();
+            game.dragonPainting.DrawHighlight();
         EndMode3D();
 
         if (cursorLocked)
@@ -124,6 +128,7 @@ void UpdateDrawFrame(void)
         if (cursorLocked)
         {
             game.painting.DrawTooltip();
+            game.dragonPainting.DrawTooltip();
         }
 
         if (awaitingRelock)

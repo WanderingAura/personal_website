@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include "pg_video_texture.hpp"
 
 namespace PG
 {
@@ -13,9 +14,11 @@ public:
 
     // position is the centre of the picture; normal is the direction it faces (e.g. away from
     // the wall it's mounted on); size is the picture's width - height follows imagePath's own
-    // aspect ratio. If linkUrl is given, clicking the painting opens it in a new tab (web only)
+    // aspect ratio. If linkUrl is given, clicking the painting opens it in a new tab (web only).
+    // If videoPath is given (web only - see VideoTexture), imagePath's image is shown as a
+    // poster until hovered, then plays that video on loop for as long as it stays hovered
     Painting(Vector3 position, Vector3 normal, float size, const char* imagePath, const char* tooltipText,
-        const char* linkUrl = nullptr);
+        const char* linkUrl = nullptr, const char* videoPath = nullptr);
 
     // must be called every frame with the current pick ray (e.g. Crosshair::GetPickRay) to
     // keep the hover state up to date; also opens linkUrl (if set) on a left click while
@@ -52,9 +55,11 @@ private:
     float height = 0.0f;
     Texture2D imageTexture{};
     Texture2D frameTexture{};
+    VideoTexture video;
     const char* tooltipText = nullptr;
     const char* linkUrl = nullptr;
     bool isHovered = false;
+    bool wasHovered = false;
 };
 
 }

@@ -23,7 +23,11 @@ Game::Game() :
          "assets/white_stucco_ao_1k.jpg", "assets/bark_willow_diff_1k.jpg", 10.0f),
     // on the back wall (z = -12), facing +Z into the room like the wall's own normal
     painting(Vector3{-3.0f, 2.5f, -12.0f}, Vector3{0.0f, 0.0f, 1.0f}, 4.0f, "assets/recollections_game.png", "Recollections - game made in 72 hours as part of a team of 6 (2 coders)\nClick to open",
-        "https://benskca.itch.io/recollections")
+        "https://benskca.itch.io/recollections"),
+    // on the left wall (x = -12), facing +X into the room like the wall's own normal; poster
+    // image is dragon_fractal.mp4's own first frame, so its aspect ratio matches the video
+    dragonPainting(Vector3{-12.0f, 2.5f, 0.0f}, Vector3{1.0f, 0.0f, 0.0f}, 4.0f, "assets/dragon_fractal_poster.jpg",
+        "Spinning fractal renderer using OpenGL\nClick to see source code", "https://github.com/WanderingAura/fractal_gl", "assets/dragon_fractal.mp4")
 {
 }
 
