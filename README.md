@@ -17,15 +17,17 @@ cmake ..
 make
 ```
 
-# Running the web build
+# Running the embedded portfolio site (Go + htmx)
 
-After building the executable change directory into the `build/src` directory and execute
+The raylib gallery is embedded inline on the portfolio site's landing page, served by a small Go backend
+in `web/` (About/Projects/Contact are also rendered there, with htmx handling client-side navigation).
+
 ```
-python -m http.server 8080
+web/scripts/build.sh   # builds the web target above and copies the WASM artifacts into web/static/wasm/
+cd web && go run .
 ```
 
-This should start an http server on localhost serving files from that folder. It should then be possible to
-view the server by going to `http://localhost:8080/personal_gallery.html`
+Then visit `http://localhost:8080`.
 
 # TODO
 - I want a room class where I can specify a size and a set of directions using bit flags representing which

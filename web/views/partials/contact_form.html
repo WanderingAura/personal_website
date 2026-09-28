@@ -1,0 +1,26 @@
+{{define "content"}}
+<section class="contact">
+  <h2>Contact</h2>
+  {{template "contact-form-fragment" .}}
+</section>
+{{end}}
+
+{{define "contact-form-fragment"}}
+<form id="contact-form" hx-post="/contact" hx-target="#contact-form" hx-swap="outerHTML">
+  <label>Name
+    <input type="text" name="name" value="{{.Name}}" required>
+  </label>
+  <label>Email
+    <input type="email" name="email" value="{{.Email}}" required>
+  </label>
+  <label>Message
+    <textarea name="message" required>{{.Message}}</textarea>
+  </label>
+  {{if .Errors}}
+  <ul class="form-errors">
+    {{range .Errors}}<li>{{.}}</li>{{end}}
+  </ul>
+  {{end}}
+  <button type="submit">Send</button>
+</form>
+{{end}}

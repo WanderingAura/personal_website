@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} raylib m)
 
 if (${PLATFORM} STREQUAL "Web")
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".js")
 else()
     # desktop builds load assets from a relative "assets/" path next to the executable
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
