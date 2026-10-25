@@ -31,7 +31,11 @@ Game::Game() :
     // on the right wall (x = 12), facing -X into the room like the wall's own normal
     hevcPainting(Vector3{12.0f, 2.5f, 0.0f}, Vector3{-1.0f, 0.0f, 0.0f}, 4.0f, "assets/h265_low_latency.png",
         "Low-latency H.265 streaming over custom protocol\nDrops stale frames, recovers with on-demand IDRs\nClick to see source code",
-        "https://github.com/WanderingAura/hevc_demo")
+        "https://github.com/WanderingAura/hevc_demo"),
+    // on the front wall (z = 12), facing -Z into the room like the wall's own normal
+    brcPainting(Vector3{0.0f, 2.5f, 12.0f}, Vector3{0.0f, 0.0f, -1.0f}, 4.0f, "assets/1brc_profile.png",
+        "One Billion Row Challenge in C++\nSIMD parsing + 16 threads: 13.8 GB in ~0.7 s\nClick to see source code",
+        "https://github.com/WanderingAura/bfbrc")
 {
 }
 

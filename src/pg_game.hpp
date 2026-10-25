@@ -17,6 +17,7 @@ namespace PG
         Painting painting;
         Painting dragonPainting;
         Painting hevcPainting;
+        Painting brcPainting;
         CollisionSystem collisionSystem;
 
         static Game& getInstance();

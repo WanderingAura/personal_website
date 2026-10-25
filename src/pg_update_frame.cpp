@@ -111,6 +111,7 @@ void UpdateDrawFrame(void)
         game.painting.Update(pickRay);
         game.dragonPainting.Update(pickRay);
         game.hevcPainting.Update(pickRay);
+        game.brcPainting.Update(pickRay);
     }
 
     if (cursorLocked && IsKeyPressed(KEY_Z)) game.cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
@@ -123,11 +124,13 @@ void UpdateDrawFrame(void)
                 game.painting.Draw();
                 game.dragonPainting.Draw();
                 game.hevcPainting.Draw();
+                game.brcPainting.Draw();
             game.lighting.EndMode();
             game.boidsDisplay.Draw();
             game.painting.DrawHighlight();
             game.dragonPainting.DrawHighlight();
             game.hevcPainting.DrawHighlight();
+            game.brcPainting.DrawHighlight();
         EndMode3D();
 
         if (cursorLocked)
@@ -141,6 +144,7 @@ void UpdateDrawFrame(void)
             game.painting.DrawTooltip();
             game.dragonPainting.DrawTooltip();
             game.hevcPainting.DrawTooltip();
+            game.brcPainting.DrawTooltip();
         }
 
         if (awaitingRelock)
