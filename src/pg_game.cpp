@@ -25,7 +25,7 @@ Game& Game::getInstance()
 
 Game::Game() :
     // centrepiece of the room, with one painting centred on each wall around it
-    boidsDisplay(BOIDS_NUM, Vector3{0.0f, 0.0f, 0.0f}, 3.0f, BoidsParams{}),
+    boidsDisplay(BOIDS_NUM, Vector3{0.0f, 0.0f, 0.0f}, 2.25f, BoidsParams{}),
     room(Vector3{0,0,0}, Vector3{ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE}, "assets/stair_planks_diff_1k.jpg", "assets/japanese_cedar_planks_diff_1k.jpg",
          "assets/white_stucco_ao_1k.jpg", "assets/bark_willow_diff_1k.jpg", ROOM_ROOF_HEIGHT),
     // on the back wall (z = -ROOM_HALF), facing +Z into the room like the wall's own normal

@@ -96,6 +96,40 @@ a {
   margin-bottom: 2.5rem;
 }
 
+.about-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.about-body p {
+  flex: 1;
+  margin-top: 0;
+}
+
+.about-photo {
+  width: 240px;
+  height: auto;
+  /* trims the trees above; 60% down keeps both the face and the capybara in frame */
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: 50% 60%;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+@media (max-width: 640px) {
+  .about-body {
+    flex-direction: column;
+  }
+
+  .about-photo {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -124,11 +158,4 @@ a {
 
 .contact-links li {
   margin-bottom: 0.5rem;
-}
-
-.site-footer {
-  text-align: center;
-  color: var(--muted);
-  padding: 1.5rem;
-  font-size: 0.85rem;
 }

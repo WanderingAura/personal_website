@@ -26,6 +26,14 @@ static float SteerAxisFromBounds(float dirComponent, float pos, float minBound, 
     return dirComponent;
 }
 
+// GetRandomValue only returns ints, which would snap positions to a whole-number grid (and
+// collapse a range narrower than 1 unit to a single point)
+static f32 RandomFloat(f32 min, f32 max)
+{
+    const constexpr s32 RESOLUTION = 10000;
+    return min + (max - min) * ((f32)GetRandomValue(0, RESOLUTION) / (f32)RESOLUTION);
+}
+
 Boids::Boids(u32 numBoids, BoundingBox bounds, const BoidsParams& params)
 {
     Initialise(numBoids, bounds, params);
@@ -51,9 +59,9 @@ void Boids::InitialiseBoids()
     {
         positions[i] = (Vector3)
         {
-            (float)GetRandomValue(minRand.x, maxRand.x),
-            (float)GetRandomValue(minRand.y, maxRand.y),
-            (float)GetRandomValue(minRand.z, maxRand.z),
+            RandomFloat(minRand.x, maxRand.x),
+            RandomFloat(minRand.y, maxRand.y),
+            RandomFloat(minRand.z, maxRand.z),
         };
 
         // TODO: probably should check if this actually generates uniform spherical coords
