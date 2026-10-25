@@ -20,8 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # the root CMakeLists.txt requires CMake >= 3.31
-      - uses: lukka/get-cmake@v4
+      - uses: lukka/get-cmake@v4.4.4
 
       # also exports EMSDK, which the root CMakeLists.txt needs for the sysroot
       - uses: emscripten-core/setup-emsdk@v15
