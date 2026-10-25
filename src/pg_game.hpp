@@ -16,6 +16,7 @@ namespace PG
         LightingSystem lighting;
         Painting painting;
         Painting dragonPainting;
+        Painting hevcPainting;
         CollisionSystem collisionSystem;
 
         static Game& getInstance();

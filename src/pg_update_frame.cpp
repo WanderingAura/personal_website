@@ -110,6 +110,7 @@ void UpdateDrawFrame(void)
         Ray pickRay = Crosshair::GetPickRay(game.cam);
         game.painting.Update(pickRay);
         game.dragonPainting.Update(pickRay);
+        game.hevcPainting.Update(pickRay);
     }
 
     if (cursorLocked && IsKeyPressed(KEY_Z)) game.cam.target = (Vector3){ 0.0f, 0.0f, 0.0f };
@@ -121,10 +122,12 @@ void UpdateDrawFrame(void)
                 game.room.Draw();
                 game.painting.Draw();
                 game.dragonPainting.Draw();
+                game.hevcPainting.Draw();
             game.lighting.EndMode();
             game.boidsDisplay.Draw();
             game.painting.DrawHighlight();
             game.dragonPainting.DrawHighlight();
+            game.hevcPainting.DrawHighlight();
         EndMode3D();
 
         if (cursorLocked)
@@ -137,6 +140,7 @@ void UpdateDrawFrame(void)
         {
             game.painting.DrawTooltip();
             game.dragonPainting.DrawTooltip();
+            game.hevcPainting.DrawTooltip();
         }
 
         if (awaitingRelock)

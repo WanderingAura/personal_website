@@ -27,7 +27,11 @@ Game::Game() :
     // on the left wall (x = -12), facing +X into the room like the wall's own normal; poster
     // image is dragon_fractal.mp4's own first frame, so its aspect ratio matches the video
     dragonPainting(Vector3{-12.0f, 2.5f, 0.0f}, Vector3{1.0f, 0.0f, 0.0f}, 4.0f, "assets/dragon_fractal_poster.jpg",
-        "Spinning fractal renderer using OpenGL\nClick to see source code", "https://github.com/WanderingAura/fractal_gl", "assets/dragon_fractal.mp4")
+        "Spinning fractal renderer using OpenGL\nClick to see source code", "https://github.com/WanderingAura/fractal_gl", "assets/dragon_fractal.mp4"),
+    // on the right wall (x = 12), facing -X into the room like the wall's own normal
+    hevcPainting(Vector3{12.0f, 2.5f, 0.0f}, Vector3{-1.0f, 0.0f, 0.0f}, 4.0f, "assets/h265_low_latency.png",
+        "Low-latency H.265 streaming over custom protocol\nDrops stale frames, recovers with on-demand IDRs\nClick to see source code",
+        "https://github.com/WanderingAura/hevc_demo")
 {
 }
 
