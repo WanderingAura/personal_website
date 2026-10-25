@@ -6,8 +6,8 @@ namespace PG
 
 static const constexpr int FONT_SIZE = 20;
 static const constexpr int LINE_SPACING = 4;
-static const constexpr char* LINE_1 = "Lost focus";
-static const constexpr char* LINE_2 = "Click to resume!";
+static const constexpr char* LINE_1 = "Portfolio";
+static const constexpr char* LINE_2 = "Click to enter";
 
 void ResumePrompt::Draw()
 {
