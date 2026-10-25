@@ -1,0 +1,134 @@
+:root {
+  color-scheme: dark;
+  --bg: #14161a;
+  --panel: #1c1f26;
+  --text: #e7e9ee;
+  --muted: #9aa1ac;
+  --accent: #5fb0ff;
+  --border: #2a2e37;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--accent);
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.brand {
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+#hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+#canvas {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #000;
+}
+
+.hero-copy {
+  flex: 1;
+  min-width: 220px;
+}
+
+.hero-copy h1 {
+  margin-top: 0;
+}
+
+#content {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+#content section {
+  scroll-margin-top: 1rem;
+  padding-top: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.project-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.project-card h3 {
+  margin-top: 0;
+}
+
+.project-card a {
+  text-decoration: none;
+}
+
+.contact-links {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-links li {
+  margin-bottom: 0.5rem;
+}
+
+.site-footer {
+  text-align: center;
+  color: var(--muted);
+  padding: 1.5rem;
+  font-size: 0.85rem;
+}

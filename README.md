@@ -17,17 +17,20 @@ cmake ..
 make
 ```
 
-# Running the embedded portfolio site (Go + htmx)
+# Portfolio site (static, GitHub Pages)
 
-The raylib gallery is embedded inline on the portfolio site's landing page, served by a small Go backend
-in `web/` (About/Projects/Contact are also rendered there, with htmx handling client-side navigation).
+The raylib gallery is embedded at the top of a single static page in `site/`, with About/Projects/Contact
+below it. Every push to `main` builds the WASM and deploys `site/` to GitHub Pages
+(`.github/workflows/pages.yml`).
 
+To preview locally (needs `EMSDK` set, e.g. `source ~/src/emsdk/emsdk_env.sh`):
 ```
-web/scripts/build.sh   # builds the web target above and copies the WASM artifacts into web/static/wasm/
-cd web && go run .
+scripts/build_site.sh       # builds the web target and copies the WASM artifacts into site/wasm/
+python -m http.server 8080  # from the repo root
 ```
 
-Then visit `http://localhost:8080`.
+Then visit `http://localhost:8080/site/`. Serving from the repo root puts the page under a sub-path, the same
+as on GitHub Pages, so any accidental absolute path shows up locally.
 
 # TODO
 - I want a room class where I can specify a size and a set of directions using bit flags representing which

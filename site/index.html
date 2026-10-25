@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jiachen Wang</title>
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body id="top">
+  <header class="site-header">
+    <a class="brand" href="#top">Jiachen Wang</a>
+    <nav class="site-nav">
+      <a href="#about">About</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="hero">
+    <canvas id="canvas" width="800" height="450" tabindex="-1"></canvas>
+    <div class="hero-copy">
+      <h1>Personal Gallery</h1>
+      <p>A game-like portfolio built with raylib, running live in your browser via WebAssembly.</p>
+    </div>
+  </section>
+
+  <main id="content">
+    <section id="about">
+      <h2>About</h2>
+      <p>
+        I'm Jiachen Wang. The room above is a small raylib gallery: walk around with WASD and the
+        mouse, click a painting to open its project, and look at the boids flocking in the glass box
+        in the middle.
+      </p>
+      <p>
+        Take a look at my <a href="#projects">projects</a>, or <a href="#contact">get in touch</a>.
+      </p>
+    </section>
+
+    <section id="projects">
+      <h2>Projects</h2>
+      <div class="project-grid">
+        <article class="project-card">
+          <h3>Recollections</h3>
+          <p>A game made in 72 hours as part of a team of 6 (2 coders).</p>
+          <a href="https://benskca.itch.io/recollections" target="_blank" rel="noopener">Play on itch.io &rarr;</a>
+        </article>
+        <article class="project-card">
+          <h3>Fractal renderer</h3>
+          <p>A spinning fractal renderer using OpenGL.</p>
+          <a href="https://github.com/WanderingAura/fractal_gl" target="_blank" rel="noopener">Source &rarr;</a>
+        </article>
+        <article class="project-card">
+          <h3>Low-latency H.265 streaming</h3>
+          <p>H.265 streaming over a custom protocol that drops stale frames and recovers with on-demand IDRs.</p>
+          <a href="https://github.com/WanderingAura/hevc_demo" target="_blank" rel="noopener">Source &rarr;</a>
+        </article>
+        <article class="project-card">
+          <h3>One Billion Row Challenge</h3>
+          <p>C++ with SIMD parsing and 16 threads: 13.8 GB processed in about 0.7 s.</p>
+          <a href="https://github.com/WanderingAura/bfbrc" target="_blank" rel="noopener">Source &rarr;</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <ul class="contact-links">
+        <li>Email: <a href="mailto:jiachen.wang2000@gmail.com">jiachen.wang2000@gmail.com</a></li>
+        <li>GitHub: <a href="https://github.com/WanderingAura" target="_blank" rel="noopener">WanderingAura</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2026 Jiachen Wang</p>
+  </footer>
+
+  <script>
+    var Module = {
+      canvas: document.getElementById('canvas'),
+      // the build output lives in wasm/, not next to this page, so Emscripten's relative
+      // lookups (notably the --preload-file .data package) must be pointed there explicitly
+      locateFile: function (path) {
+        return 'wasm/' + path;
+      },
+    };
+  </script>
+  <script src="wasm/personal_gallery.js"></script>
+</body>
+</html>

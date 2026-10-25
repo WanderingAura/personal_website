@@ -4,8 +4,8 @@ build/
 build-web/
 *_build/
 compile_commands.json
-web/static/wasm/*
-!web/static/wasm/.gitkeep
+site/wasm/*
+!site/wasm/.gitkeep
 
 # Prerequisites
 *.d

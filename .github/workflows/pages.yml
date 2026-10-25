@@ -1,0 +1,47 @@
+name: Deploy site to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # the root CMakeLists.txt requires CMake >= 3.31
+      - uses: lukka/get-cmake@v4
+
+      # also exports EMSDK, which the root CMakeLists.txt needs for the sysroot
+      - uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: 4.0.18
+          actions-cache-folder: emsdk-cache
+
+      - name: Build WASM into site/wasm
+        run: scripts/build_site.sh
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
